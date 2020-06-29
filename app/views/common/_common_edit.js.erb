@@ -1,0 +1,13 @@
+(function() {
+  let edit_clone = $("<tr data-id=<%= object.id %> data-edit='true' style='display: none'></tr>")
+  edit_clone.html("<%= j  render partial: 'edit', locals: {singular.to_sym => object, url: url, colspan: controller.default_colspan} %>")
+  let top_pos = $('.<%= singular %>-table [data-id=<%= object.id %>]').offset().top
+    $('.<%= singular %>-table > tbody > tr[data-id=<%= object.id %>]:not([data-edit=\'true\'])').fadeOut(() => {
+      $(edit_clone).insertAfter('.<%= singular %>-table > tbody > tr[data-id=<%= object.id %>]')
+      $(edit_clone).fadeIn();
+
+      let fifth_window_height = Number(window.innerHeight*(1/5));
+      $('html, body').animate({scrollTop: top_pos - fifth_window_height},500);
+  });
+})()
+

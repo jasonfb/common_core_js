@@ -1,0 +1,6 @@
+<%%= render partial: 'common/common_update', locals: {object: @<%= singular %>, singular: "<%= singular %>",
+plural: "<%= plural %>",
+ url: <%= path_helper %>(<%= path_arity %>),
+ pass_through_locals: {
+  <%= nested_assignments %>
+}} %>

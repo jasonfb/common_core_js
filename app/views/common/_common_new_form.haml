@@ -1,0 +1,10 @@
+%h3
+  New
+  = singular.titlecase
+
+= form_with model: object, url: url, method: "post", remote: true do  |f|
+  = render partial: "#{controller.namespace}#{plural}/form", locals: {singular.to_sym => object, f: f}
+
+  .row
+    .col-md-12
+      = f.submit "Save", class: "btn btn-primary pull-right"

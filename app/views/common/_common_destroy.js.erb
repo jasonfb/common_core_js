@@ -1,0 +1,11 @@
+
+<% if object.errors.none? %>
+$(".<%= singular %>-list table tr[data-id=<%= object.id %>]").css({color: 'red', 'text-decoration': 'line-through'});
+$(".<%= singular %>-list table tr[data-id=<%= object.id %>]").fadeOut(750,function () {
+  $(".<%= singular %>-list").html("<%= j render partial: "list", locals: {plural.to_sym => all_objects} %>")
+})
+
+<% else  %>
+$(".flash-notices").html("<%= j render 'layouts/flash_notices' %>");
+$(".<%= singular %>-list").html("<%= j render(partial: '#{controller.namespace}errors', locals: {resource: object}) %><br/<%= j render partial: "list", locals: {plural.to_sym => all_objects} %>")
+<% end %>

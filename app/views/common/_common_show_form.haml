@@ -1,0 +1,11 @@
+%td{style: "position: relative;"}
+  - if object.try(:to_label)
+    = object.to_label
+  - elsif object.try(:name)
+    = object.name
+  - else
+    - raise "#{object.inspect} does not implement either a to_label or a name"
+  .show-area
+    = render partial: "form", locals: {singular.to_sym => object, f: form_faker(object)}
+
+

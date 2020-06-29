@@ -1,0 +1,16 @@
+%td{style: "position: relative;", colspan: controller.default_colspan}
+  Editing
+  - if object.try(:to_label)
+    = object.to_label
+  - elsif object.try(:name)
+    = object.name
+  - else
+    (no name)
+
+  = form_with model: object, url: url do |f|
+    = render partial: "form",  locals: {singular.to_sym => object, f: f}
+    .row
+      .col-md-12
+        = f.submit "Save", class: "btn btn-primary pull-right"
+
+  %i.fa.fa-times-circle.fa-2x{ 'data-name' => singular, 'data-row-id' => object.id, 'data-role' => 'close-button'}

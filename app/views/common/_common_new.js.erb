@@ -1,0 +1,9 @@
+
+<% scope = "" %>
+<% if controller.common_scope %>
+<% scope = controller.common_scope.map{|k,v| '.' + k.to_s + "-table > tbody > tr[data-id=".html_safe + v.id.to_s + ']'}.join(" ").html_safe %>
+<% end  %>
+
+$("<%= (scope + " ") if controller.common_scope %> .new-<%= singular %>-button").fadeOut(function() {
+  $("<%= (scope + " ") if controller.common_scope %> .new-<%= singular %>-form").html("<%= j render(partial: "new" ) %><i class='fa fa-times-circle fa-2x' data-name='<%= singular %>' data-role='close-button' />").slideDown();
+})

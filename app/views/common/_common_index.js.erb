@@ -1,0 +1,1 @@
+$('.<%= singular %>-list').html("<%= j render partial: "#{controller.namespace}#{plural}/list", locals: {plural.to_sym => objects} %>")
