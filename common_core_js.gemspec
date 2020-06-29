@@ -29,8 +29,12 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
 
   spec.add_dependency "rails", "~> 6.0.3", ">= 6.0.3.2"
-  spec.homepage    = 'http://rubygems.org/gems/common-core-js'
-  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/common_core_js" }
+  spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/common-core-js/'
+  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/common_core_js",
+                       "documentation_uri" => "https://github.com/jasonfb/common_core_js",
+                       "homepage_uri" => 'https://blog.jasonfleetwoodboldt.com/common-core-js/',
+                      "mailing_list_uri" => 'https://blog.jasonfleetwoodboldt.com/#sfba-form2-container'
+  }
 
   spec.add_runtime_dependency('kaminari', '> 1', '>= 1.2.1')
   spec.add_runtime_dependency('haml-rails', '> 2', '>= 2.0.1')
