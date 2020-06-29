@@ -1,4 +1,4 @@
-# Common Core Scaffold Builder & Rapid Prototype Develoepr
+# Common Core Scaffold Builder & Rapid Prototype Developer
 
 
 Yes, it's a Rails scaffoling builder. Yes, it builds scaffolding quickly and easily. Yes, it's similar to all the other Rails scaffold builders. 
@@ -166,8 +166,8 @@ And add to config/webpack/environment.js
 const webpack = require('webpack')
 environment.plugins.prepend('Provide',
   new webpack.ProvidePlugin({
-    $: 'jquery',
-    jQuery: 'jquery',
+    $: 'jquery/src/jquery',
+    jQuery: 'jquery/src/jquery',
     Rails: ['@rails/ujs']
   })
 )
