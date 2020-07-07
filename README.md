@@ -12,6 +12,20 @@ No, I would not use this to build an intricate app. Yes, it's a great tool for p
 rails generate common_core:scaffold Thing 
 ```
 
+TO INSTALL:
+
+- Add common_core_js to your Gemfile
+
+- Install jQuery (required)
+
+- Install Bootstrap (optional)
+
+- Install Devise or implement your own authentication
+
+
+
+
+
 ## Options
 
 Note that the arguments are not preceeded by dashes and are followed by equal sign and the input you are giving.
@@ -27,28 +41,51 @@ TitleCase class name of the thing you want to build a scaffoling for.
 pass `namespace=` as a flag to denote a namespace to apply to the Rails path helpers
 
 
-`rails generate common_core:scaffold GetEmailsRule namespace=dashboard`
+`rails generate common_core:scaffold Thing namespace=dashboard`
+
+This produces several views at `app/views/dashboard/things/` and a controller at`app/controllers/dashboard/things_controller.rb`
+
+The controller looks like so:
+
+```
+class Dashboard::ThingsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :load_thing, only: [:show, :edit, :update, :destroy]
+  def load_thing
+    @thing = current_user.things.find(params[:id])
+  end
+  ...
+end
+
+```
+
 
 ### `nest=`
 
 pass `nest=` as a flag to denote a nested resources
 
 
-`rails generate common_core:scaffold Lineitem nest=invoice`
+`rails generate common_core:scaffold Line nest=invoice`
+
+In this example, it is presumed that the current user has_many :invoices, and that invoices have many :lines
+
 
 For multi-level nesting use slashes to separate your levels of nesting. Remember, you should match what you have in your routes.rb file.
 
 ```
 resources :invoices do
     resources :lines do
-        resources :charges
+        resources :charge
     end    
 end
 
 ```
+In this example, it is presumed that the current user has_many :invoices, and that invoices have many :lines, and that lines have many :charges
+
 
 To generate scaffold: 
  `rails generate common_core:scaffold Charge nest=invoice/line`
+
 The order of the nest should match the nested resources you have in your own app.  In particular, you auth root will be used as the starting point when loading the objects from the URL:
 
 In the example above, @invoice will be loaded from
@@ -59,11 +96,11 @@ Then, @line will be loaded
 
 `@line = @invoice.lines.find(params[:line_id])`
 
-Then finally the @charge will be loaded
+Then, finally the @charge will be loaded
 
 `@charge = @line.charges.find(params[:id])`
 
-It's called "poor man's auth" because if a user attempts to hack the URL by passing ids for objects they don't own--- which Rails makes relatively easy with its default URL pattern-- they will hit ActiveRecord not found errros because the objects will not be found in the assocaited relationships. 
+It's called "poor man's auth" because if a user attempts to hack the URL by passing ids for objects they don't own--- which Rails makes relatively easy with its default URL pattern-- they will hit ActiveRecord not found errors (the objects they don't own won't be found in the associated relationship). 
 
 It works, but it isn't granular. As well, it isn't appropriate for a large app with any level of intricacy to access control (that is, having roles). 
 
@@ -72,7 +109,7 @@ Your customers can delete their own objects by default (may be a good idea or a 
 
 ### `auth=`
 
-By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for what is fundamentally "poor man's auth."
+By default, it will be assumed you have a `current_user` for your user authentication. This will be treated as the "authentication root" for the "poor man's auth" explained above.
 
 The poor man's auth presumes that object graphs have only one natural way to traverse them (that is, one primary way to traverse them), and that all relationships infer that a set of things or their descendants are granted access to me for reading, writing, updating, and deleting. 
 
@@ -97,7 +134,7 @@ If you supply nesting (see below), your nest chain will automatically begin with
 
 ### `auth_identifier=`
 
-Your controller will call a method authenticate_ (AUTH IDNETIFIER) bang, like:
+Your controller will call a method authenticate_ (AUTH IDENTIFIER) bang, like:
 
 `authenticate_user!`
 
@@ -107,14 +144,21 @@ Before all of the controller actions. If you leave this blank, it will default t
 Leave blank for default, which is to match the auth. 
 
  `rails generate common_core:scaffold Thing auth=current_account auth_identifier=login` 
- In this example, the controller produced with have:
+ In this example, the controller produced with:
 ```
    before_action :authenticate_login!
-   ```
+```
+However, the object graph anchors would continue to start from current_account. That is,
+```
+@thing = current_account.things.find(params[:id])
+```
 
-
-Use empty string to turn this method off:
+Use empty string to **turn this method off**:
  `rails generate common_core:scaffold Thing auth=current_account auth_identifier=''` 
+
+In this case a controller would be generated that would have NO before_action to authenticate the account, but it would still treat the current_account as the auth root for the purpose of loading the objects.
+
+Please note that this example would product non-functional code, so you would need to manually fix your controllers.
 
 
 ### `plural=`
@@ -128,6 +172,14 @@ Use this flag to create controllers with no root authentication. You can still u
 
 For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use --god flag
 
+In God mode, the objects are loaded directly from the base class (these controllers have full access)
+```
+def load_thing
+    @thing = Thing.find(params[:id])
+end
+
+```
+
 ### `--with-index`
 
 By default no master index views get produced. Use this flag to produce an index view. 
@@ -135,6 +187,15 @@ By default no master index views get produced. Use this flag to produce an index
 The index views simply include the _list partial but pass them a query to use:
 
 `= render partial: "list", locals: {things: Thing.order("created_at DESC").page(1)}`
+
+You will note that unlike other scaffold you may have seen, the "all" view is found at
+```
+all_things.haml
+```
+
+
+
+
 
 # TROUBLESHOOTING
 

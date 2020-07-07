@@ -228,6 +228,8 @@ module CommonCore
     def create_merge_params
       if @auth
         "#{@auth_identifier}: #{@auth}"
+      else
+        ""
       end
     end
 
