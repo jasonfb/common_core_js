@@ -9,6 +9,6 @@ test/dummy/storage/
 test/dummy/tmp/
 
 
-
+.idea/
 *.gem
 .DS_Store
