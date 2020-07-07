@@ -101,7 +101,7 @@ module CommonCore
     def copy_controller_and_spec_files
 
       @default_colspan = @columns.size
-      template "controller.rb", File.join("app/controllers", "#{plural}_controller.rb")
+      template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
       # template "index", File.join("app/views", "app/views/#{self.name.downcase}/index")
 
     end
@@ -112,7 +112,13 @@ module CommonCore
     end
 
     def controller_class_name
-      plural.titleize.gsub(" ", "") + "Controller"
+
+      res = ""
+      res << @namespace.titleize + "::" if @namespace
+
+
+      res << plural.titleize.gsub(" ", "") + "Controller"
+      res
     end
 
     def singular_name
@@ -184,7 +190,7 @@ module CommonCore
         formats.each do |format|
 
           filename = cc_filename_with_extensions(view, ["js","erb"])
-          template filename, File.join("app/views", controller_file_path, filename)
+          template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
       end
 
@@ -192,8 +198,16 @@ module CommonCore
         formats.each do |format|
 
           filename = cc_filename_with_extensions(view, "haml")
-          template filename, File.join("app/views", controller_file_path, filename)
+          template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
+      end
+    end
+
+    def namespace_with_dash
+      if @namespace
+        "/#{@namespace}"
+      else
+        ""
       end
     end
 
