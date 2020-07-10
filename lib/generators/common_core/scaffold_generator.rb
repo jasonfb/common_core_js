@@ -61,8 +61,6 @@ module CommonCore
         end
       end
 
-
-
       flags = meta_args[1]
       flags.each do |f|
         case (f)
@@ -72,8 +70,6 @@ module CommonCore
           @with_index = true
         end
       end
-
-
 
       if @auth_identifier.nil? && !@auth.nil?
         @auth_identifier = @auth.gsub("current_", "")
@@ -86,7 +82,6 @@ module CommonCore
         @nested_args.each do |a|
           @nested_args_plural[a] = a + "s"
         end
-
       end
     end
 
@@ -99,24 +94,17 @@ module CommonCore
     end
 
     def copy_controller_and_spec_files
-
       @default_colspan = @columns.size
       template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
-      # template "index", File.join("app/views", "app/views/#{self.name.downcase}/index")
-
     end
-
 
     def list_column_headings
       @columns.map(&:to_s).map{|col_name| '      %th{:scope => "col"} ' + col_name.humanize}.join("\r")
     end
 
     def controller_class_name
-
       res = ""
       res << @namespace.titleize + "::" if @namespace
-
-
       res << plural.titleize.gsub(" ", "") + "Controller"
       res
     end
@@ -138,7 +126,6 @@ module CommonCore
       "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
     end
 
-
     def path_arity
       (nested_objects_arity + ", " if @nested_args) + "@" + singular
     end
@@ -146,7 +133,6 @@ module CommonCore
     def line_path_partial
       "#{@namespace+"/" if @namespace}#{singular}/line"
     end
-
 
     def nested_assignments
       @nested_args.map{|a| "#{a}: @#{a}"}.join(", ") #metaprgramming into Ruby hash
@@ -172,6 +158,19 @@ module CommonCore
       end
     end
 
+
+    def all_objects_root
+      if @auth
+        if @nested_args.none?
+          @auth + ".#{plural}"
+        else
+          "@" + @nested_args.last + ".#{plural}"
+        end
+      else
+        @singular_class + ".all"
+      end
+    end
+
     def any_nested?
       @nested_args.any?
     end
@@ -188,7 +187,6 @@ module CommonCore
     def copy_view_files
       js_views.each do |view|
         formats.each do |format|
-
           filename = cc_filename_with_extensions(view, ["js","erb"])
           template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
@@ -196,7 +194,6 @@ module CommonCore
 
       haml_views.each do |view|
         formats.each do |format|
-
           filename = cc_filename_with_extensions(view, "haml")
           template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
@@ -211,12 +208,23 @@ module CommonCore
       end
     end
 
+    def namespace_with_trailing_dash
+      if @namespace
+        "#{@namespace}/"
+      else
+        ""
+      end
+    end
+
     def js_views
       %w(index create destroy edit new update)
     end
 
     def haml_views
-      %w(_edit _form _line _list _new)
+      res =  %w(_edit _form _line _list _new)
+      if @with_index
+        res << 'all'
+      end
     end
 
 
@@ -232,8 +240,6 @@ module CommonCore
         ""
       end
     end
-
-
 
     def model_has_strings?
       false

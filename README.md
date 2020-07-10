@@ -22,10 +22,6 @@ TO INSTALL:
 
 - Install Devise or implement your own authentication
 
-
-
-
-
 ## Options
 
 Note that the arguments are not preceeded by dashes and are followed by equal sign and the input you are giving.
@@ -141,7 +137,26 @@ Your controller will call a method authenticate_ (AUTH IDENTIFIER) bang, like:
 Before all of the controller actions. If you leave this blank, it will default to using the variable name supplied by auth with "current_" stripped away. 
 (This is setup for devise.)
 
-Leave blank for default, which is to match the auth. 
+Be sure to implement the following method in your ApplicationController or some other method. Here's a quick example using Devise. You will note in the code below, user_signed_in? is implemented when you add Devise methods to your User table. 
+
+As well, the `after_sign_in_path_for(user)` here is a hook for Devise also that provides you with after login redirect to the page where the user first intended to go.
+
+```
+  def authenticate_user!
+    if ! user_signed_in?
+      session['user_return_to'] = request.path
+      redirect_to new_user_registration_path
+    end
+  end
+
+  def after_sign_in_path_for(user)
+    session['user_return_to'] || account_url(user)
+  end
+```
+
+
+The default (do not pass `auth_identifier=`) will match the `auth` (So if you use 'account' as the auth, `authenticate_account!` will get invoked from your generated controller; the default is always 'user', so you can leave both auth and auth_identifier off if you want 'user') 
+
 
  `rails generate common_core:scaffold Thing auth=current_account auth_identifier=login` 
  In this example, the controller produced with:
@@ -190,7 +205,7 @@ The index views simply include the _list partial but pass them a query to use:
 
 You will note that unlike other scaffold you may have seen, the "all" view is found at
 ```
-all_things.haml
+all.haml
 ```
 
 

@@ -28,7 +28,7 @@ class <%= controller_class_name %> < ApplicationController
 
     respond_to do |format|
       format.js<% if @with_index %>
-      format.html {render 'all_<%=plural_name %>.haml'}<% end %>
+      format.html {render 'all.haml'}<% end %>
     end
   end
 
