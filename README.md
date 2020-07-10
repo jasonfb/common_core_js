@@ -208,9 +208,17 @@ You will note that unlike other scaffold you may have seen, the "all" view is fo
 all.haml
 ```
 
+Common core generate ONLY this top-level (non-partial) HAML file, relying on Rails partials to do the rest. This lets us get little fancy with reloading and re-rendering, and provides for a smooth consistent starting point for you to customize the views. 
 
+The intention is that you DO NOT generate any all.haml views, because you will probably be building a dashboard that composites several different tables into a single page.
 
+When you do that, load the list views from the build scaffolding to define the different sections of your page
 
+```
+= render partial: "dashboard/things/list", locals: {things: current_user.things.order("created_at DESC").page(1)}
+```
+
+Because it's rare that you actually want to build a page that is just a list of one table, the index views are not generate by default.
 
 # TROUBLESHOOTING
 
