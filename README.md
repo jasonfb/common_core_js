@@ -100,7 +100,7 @@ It's called "poor man's auth" because if a user attempts to hack the URL by pass
 
 It works, but it isn't granular. As well, it isn't appropriate for a large app with any level of intricacy to access control (that is, having roles). 
 
-Your customers can delete their own objects by default (may be a good idea or a bay idea for you). If you don't want that, you should strip out the delete actions off the controllers. 
+Your customers can delete their own objects by default (may be a good idea or a bad idea for you). If you don't want that, you should strip out the delete actions off the controllers. 
 
 
 ### `auth=`
@@ -173,7 +173,7 @@ Use empty string to **turn this method off**:
 
 In this case a controller would be generated that would have NO before_action to authenticate the account, but it would still treat the current_account as the auth root for the purpose of loading the objects.
 
-Please note that this example would product non-functional code, so you would need to manually fix your controllers.
+Please note that this example would product non-functional code, so you would need to manually fix your controllers to make sure `current_account` is available to the controller.
 
 
 ### `plural=`
