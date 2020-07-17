@@ -22,6 +22,9 @@ TO INSTALL:
 
 - Install Devise or implement your own authentication
 
+- Unless you want to bypass specs, you'll also want Rspec (rspec-rails), factory_bot_rails, and shoulda-matchers
+ 
+
 ## Options
 
 Note that the arguments are not preceeded by dashes and are followed by equal sign and the input you are giving.
@@ -219,6 +222,20 @@ When you do that, load the list views from the build scaffolding to define the d
 ```
 
 Because it's rare that you actually want to build a page that is just a list of one table, the index views are not generate by default.
+
+
+### `--specs-only`
+
+Produces ONLY the controller spec file, nothing else.
+
+
+### `--no-specs`
+
+Produces all the files except the spec file.
+
+
+
+
 
 # TROUBLESHOOTING
 

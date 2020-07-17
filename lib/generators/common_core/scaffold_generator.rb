@@ -68,7 +68,16 @@ module CommonCore
           @auth = nil
         when "--with-index"
           @with_index = true
+        when "--specs-only"
+          @specs_only = true
+        when "--no-specs"
+          @no_specs = true
         end
+      end
+
+      if @specs_only && @no_specs
+        puts "oops… you seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
+        exit
       end
 
       if @auth_identifier.nil? && !@auth.nil?
@@ -95,11 +104,38 @@ module CommonCore
 
     def copy_controller_and_spec_files
       @default_colspan = @columns.size
-      template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
+
+      unless @specs_only
+        template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
+      end
+
+      unless @no_specs
+        template "controller_spec.rb", File.join("spec/controllers#{namespace_with_dash}", "#{plural}_controller_spec.rb")
+      end
     end
 
     def list_column_headings
       @columns.map(&:to_s).map{|col_name| '      %th{:scope => "col"} ' + col_name.humanize}.join("\r")
+    end
+
+    def columns_spec_with_sample_data
+      @columns.map { |c|
+        if eval("#{singular_class}.columns_hash['#{c}']").nil?
+          byebug
+        end
+        type = eval("#{singular_class}.columns_hash['#{c}']").type
+        random_data = case type
+          when :integer
+            rand(1...1000)
+          when :string
+            FFaker::AnimalUS.common_name
+          when :text
+            FFaker::AnimalUS.common_name
+          when :datetime
+            Time.now + rand(1..5).days
+        end
+        c.to_s + ": '" + random_data.to_s + "'"
+      }.join(", ")
     end
 
     def controller_class_name
@@ -127,7 +163,11 @@ module CommonCore
     end
 
     def path_arity
-      (nested_objects_arity + ", " if @nested_args) + "@" + singular
+      res = ""
+      if @nested_args.any?
+        res << nested_objects_arity + ", "
+      end
+      res << "@" + singular
     end
 
     def line_path_partial
@@ -177,7 +217,7 @@ module CommonCore
 
     def all_objects_variable
       # needs the authenticated root user
-      "#{@auth}#{'.' + @nested_args.map{|a| "#{@nested_args_plural[a]}.find(@#{a})"}.join('.') + "." if @nested_args}#{plural}"
+      "#{@auth}.#{ @nested_args.map{|a| "#{@nested_args_plural[a]}.find(@#{a})"}.join('.') + "." if @nested_args.any?}#{plural}"
     end
 
     def auth_object
@@ -185,12 +225,14 @@ module CommonCore
     end
 
     def copy_view_files
+      return if @specs_only
       js_views.each do |view|
         formats.each do |format|
           filename = cc_filename_with_extensions(view, ["js","erb"])
           template filename, File.join("app/views#{namespace_with_dash}", controller_file_path, filename)
         end
       end
+
 
       haml_views.each do |view|
         formats.each do |format|
@@ -225,6 +267,7 @@ module CommonCore
       if @with_index
         res << 'all'
       end
+      res
     end
 
 
