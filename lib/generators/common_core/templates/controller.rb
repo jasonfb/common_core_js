@@ -58,14 +58,12 @@ class <%= controller_class_name %> < ApplicationController
   end
 
   def edit
-
     respond_to do |format|
       format.js
     end
   end
 
   def update
-
     respond_to do |format|
       if !@<%=singular_name %>.save
         flash[:alert] = "<%=singular_name.titlecase %> could not be saved"

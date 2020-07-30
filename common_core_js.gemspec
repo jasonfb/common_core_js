@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
 
-  spec.add_dependency "rails", "~> 6.0.3", ">= 6.0.3.2"
+  spec.add_dependency "rails"
   spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/common-core-js/'
   spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/common_core_js",
                        "documentation_uri" => "https://github.com/jasonfb/common_core_js",
@@ -36,10 +36,10 @@ Gem::Specification.new do |spec|
                       "mailing_list_uri" => 'https://blog.jasonfleetwoodboldt.com/#sfba-form2-container'
   }
 
-  spec.add_runtime_dependency('kaminari', '> 1', '>= 1.2.1')
-  spec.add_runtime_dependency('haml-rails', '> 2', '>= 2.0.1')
+  spec.add_runtime_dependency('kaminari')
+  spec.add_runtime_dependency('haml-rails')
 
-  spec.add_development_dependency('simplecov', '~> 0.17', '> 0.17')
+  # spec.add_development_dependency('simplecov')
 
 
   spec.post_install_message = <<~MSG
@@ -49,12 +49,13 @@ Gem::Specification.new do |spec|
     rails generate common_score:scaffold Thing
 
         * Build plug-and-play scaffolding mixing HAML with jQuery-based Javascript
-        * Automatically Reads Your Models (make them first!)
+        * Automatically Reads Your Models (make them before building your scaffolding!)
         * Excellent for CRUD, lists with pagination, searching, sorting.
-        * Wonderful for prototyping
-        * Plays with Devise, Kaminari, Haml-Rails
+        * Wonderful for prototyping.
+        * Plays nicely with Devise, Kaminari, Haml-Rails, Rspec.
+        * Create specs autoamatically along with the controllers.
         * Nest your routes model-by-model for built-in poor man's authentication
-        * Throw it away when you're done. 
+        * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
     see README for complete instructions.
     ---------------------------------------------

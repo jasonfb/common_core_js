@@ -2,8 +2,6 @@ require 'rails/generators/erb/scaffold/scaffold_generator'
 
 module CommonCore
   class ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
-
-
     hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)
@@ -29,10 +27,6 @@ module CommonCore
 
       args = meta_args[0]
       @singular = args[0].tableize.singularize # should be in form hello_world
-
-
-
-
 
 
       @plural = @singular + "s" # supply to override; leave blank to use default
@@ -138,6 +132,35 @@ module CommonCore
       }.join(", ")
     end
 
+    def object_parent_mapping_as_argument_for_specs
+      if @nested_args.any?
+        ", " + @nested_args.last + ": " + @nested_args.last
+      elsif @auth
+       ", #{@auth_identifier}: #{@auth}"
+      end
+    end
+
+    def objest_nest_factory_setup
+      res = ""
+      if @auth
+        last_parent = ", #{@auth_identifier}: #{@auth}"
+      end
+
+      @nested_args.each do |arg|
+        res << "  let(:#{arg}) {create(:#{arg} #{last_parent} )}\n"
+        last_parent = ", #{arg}: #{arg}"
+      end
+      res
+    end
+
+
+    def objest_nest_params_by_id_for_specs
+      @nested_args.map{|arg|
+        "#{arg}_id: #{arg}.id"
+      }.join(",\n          ")
+    end
+
+
     def controller_class_name
       res = ""
       res << @namespace.titleize + "::" if @namespace
@@ -158,8 +181,12 @@ module CommonCore
     end
 
 
-    def path_helper
+    def path_helper_singular
       "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
+    end
+
+    def path_helper_plural
+      "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{plural}_path"
     end
 
     def path_arity
@@ -171,7 +198,7 @@ module CommonCore
     end
 
     def line_path_partial
-      "#{@namespace+"/" if @namespace}#{singular}/line"
+      "#{@namespace+"/" if @namespace}#{plural}/line"
     end
 
     def nested_assignments
@@ -293,6 +320,62 @@ module CommonCore
       []
     end
 
+
+
+    def all_form_fields
+      res = @columns.map { |col|
+        # if eval("#{singular_class}.columns_hash['#{col}']").nil?
+        #   byebug
+        # end
+
+        type = eval("#{singular_class}.columns_hash['#{col}']").type
+        limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+        sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+
+        case type
+        when :integer
+          # look for a belongs_to on this object
+          if col.to_s.ends_with?("_id")
+
+            assoc_name = col.to_s.gsub("_id","")
+            assoc = eval("#{singular_class}.reflect_on_association(':#{assoc_name}')")
+            ".row
+  .form-group.col-md-4
+    = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :to_label, {:prompt => true}, class: 'form-control')
+    %label.small.form-text.text-muted
+      #{col.to_s.humanize}"
+
+          else
+            ".row
+  .form-group.col-md-4
+    = f.text_field :#{col.to_s}, class: 'form-control', size: 4, type: 'number'
+    %label.form-text
+      #{col.to_s.humanize}\n"
+          end
+        when :string
+          width = (limit && limit < 40) ? limit : (40)
+          ".row
+  .form-group.col-md-4
+    = f.text_field :#{col.to_s}, size: #{width}, class: 'form-control'
+    %label.form-text
+      #{col.to_s.humanize}\n"
+        when :text
+          # width = (limit && limit < 40) ? limit :  (40)
+          ".row
+  .form-group.col-md-4
+    = f.text_area :#{col.to_s}, rows: 4, cols: 40, class: 'form-control'
+    %label.form-text
+      #{col.humanize}\n"
+          when :datetime
+            ".row
+  .form-group.col-md-4
+    = f.text_field :#{col.to_s}, class: 'form-control', type: 'datetime-local'
+    %label.form-text
+      #{col.to_s.humanize}\n"
+          end
+      }.join("\n")
+      return res
+    end
 
     private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods

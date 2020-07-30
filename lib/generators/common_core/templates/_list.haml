@@ -1,5 +1,5 @@
 
-= link_to "New <%= singular.gsub('_',' ') %>", new_<%= path_helper %>(<%= nested_arity_for_path %>), disable_with: "Loading...", remote: true, class: "new-<%= singular %>-button btn btn-primary pull-right"
+= link_to "New <%= singular.gsub('_',' ') %>", new_<%= path_helper_singular %>(<%= nested_arity_for_path %>), disable_with: "Loading...", remote: true, class: "new-<%= singular %>-button btn btn-primary pull-right"
 
 .clearfix
 .new-<%= singular %>-form{style: "display: none; position: relative;"}
