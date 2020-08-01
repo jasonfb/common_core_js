@@ -1,0 +1,43 @@
+
+[data-role='close-button'] {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+
+i {
+    cursor: pointer;
+}
+
+
+.show-area{
+span.content {
+    background-color: #ddd;
+    padding: 0px 6px;
+    display: inline-block;
+}
+}
+
+
+td.paginate{
+    position: relative;
+}
+
+nav.pagination {
+    display: block;
+    text-align: right;
+    right: 0;
+    top: 0;
+
+    font-size: 1.1em;
+
+span {
+    margin: 0 2px;
+}
+span.page.current {
+    color: black;
+    text-decoration: underline;
+
+}
+}
