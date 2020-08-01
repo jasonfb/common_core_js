@@ -320,8 +320,6 @@ module CommonCore
       []
     end
 
-
-
     def all_form_fields
       res = @columns.map { |col|
         # if eval("#{singular_class}.columns_hash['#{col}']").nil?
@@ -376,6 +374,52 @@ module CommonCore
       }.join("\n")
       return res
     end
+
+    def all_line_fields
+      res = "%tr{'data-id': #{singular}.id, 'data-edit': 'false'}\n"
+
+      res << @columns.map { |col|
+        type = eval("#{singular_class}.columns_hash['#{col}']").type
+        limit = eval("#{singular_class}.columns_hash['#{col}']").limit
+        sql_type = eval("#{singular_class}.columns_hash['#{col}']").sql_type
+
+        case type
+        when :integer
+          # look for a belongs_to on this object
+          if col.to_s.ends_with?("_id")
+
+            assoc_name = col.to_s.gsub("_id","")
+
+
+            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+
+            if assoc.nil?
+              raise "can't find assocation for #{assoc_name}"
+            end
+
+            "  %td
+    = #{singular}.#{assoc.name.to_s}.to_label"
+
+          else
+            "  %td
+    = #{singular}.#{col}"
+          end
+        when :string
+          width = (limit && limit < 40) ? limit : (40)
+          "  %td
+    = #{singular}.#{col}"
+        when :text
+          "  %td
+    = #{singular}.#{col}"
+        when :datetime
+          "  %td
+    = #{singular}.#{col}"
+        end
+      }.join("\n")
+      return res
+    end
+
+
 
     private # thor does something fancy like sending the class all of its own methods during some strange run sequence
     # does not like public methods
