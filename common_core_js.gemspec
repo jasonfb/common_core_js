@@ -2,7 +2,7 @@ $:.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
 require "common_core_js/version"
-
+require 'byebug'
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "common_core_js"
@@ -26,7 +26,11 @@ Gem::Specification.new do |spec|
       "public gem pushes."
   end
 
-  spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md"]
+  # spec.files = Dir["{app,config,db,lib,vendor}/**/*", "LICENSE", "Rakefile", "README.md"]
+
+  spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
+    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  end
 
   spec.add_dependency "rails"
   spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/common-core-js/'
@@ -38,9 +42,11 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency('kaminari')
   spec.add_runtime_dependency('haml-rails')
+  spec.add_runtime_dependency "sass-rails"
 
-  # spec.add_development_dependency('simplecov')
-
+  spec.add_runtime_dependency 'bootsnap'
+  spec.add_runtime_dependency 'bootstrap'
+  spec.add_runtime_dependency 'font-awesome-rails'
 
   spec.post_install_message = <<~MSG
     ---------------------------------------------
@@ -60,5 +66,4 @@ Gem::Specification.new do |spec|
     see README for complete instructions.
     ---------------------------------------------
   MSG
-
 end

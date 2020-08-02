@@ -1,1 +1,3 @@
 <%= all_line_fields %>
+  %td
+    = link_to "Edit <i class='fa fa-1x fa-list-alt'></i>".html_safe, edit_<%= path_helper_singular %>(<%= singular %>), remote: true , disable_with: "Loading...", class: "edit-<%= singular %>-button btn btn-primary pull-right "

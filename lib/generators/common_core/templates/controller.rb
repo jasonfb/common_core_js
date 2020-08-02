@@ -65,7 +65,7 @@ class <%= controller_class_name %> < ApplicationController
 
   def update
     respond_to do |format|
-      if !@<%=singular_name %>.save
+      if !@<%=singular_name %>.update(<%= singular %>_params)
         flash[:alert] = "<%=singular_name.titlecase %> could not be saved"
       end
       format.js {}
