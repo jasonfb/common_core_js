@@ -1,8 +1,6 @@
 Description:
-    Explain the generator
+    Generate a controller, view files, and spec
 
 Example:
-    rails generate common_core_scaffold Thing
+    rails generate common_core:scaffold Thing
 
-    This will create:
-        what/will/it/create

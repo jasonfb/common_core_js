@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'bootsnap'
   spec.add_runtime_dependency 'bootstrap'
   spec.add_runtime_dependency 'font-awesome-rails'
+  spec.add_dependency 'ffaker'
 
   spec.post_install_message = <<~MSG
     ---------------------------------------------

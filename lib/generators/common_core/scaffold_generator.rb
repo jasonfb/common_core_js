@@ -1,4 +1,5 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
+require 'ffaker'
 
 module CommonCore
   class ScaffoldGenerator < Erb::Generators::ScaffoldGenerator

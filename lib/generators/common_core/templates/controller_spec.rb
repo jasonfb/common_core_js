@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe <%= controller_class_name %> do
   render_views
-  let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}
+  <% unless @auth.nil? %>  let(:<%= @auth %>) {create(:<%= @auth.gsub('current_', '') %>)}<%end%>
   let(:<%= singular %>) {create(:<%= singular %><%= object_parent_mapping_as_argument_for_specs %> )}
 
 <%= objest_nest_factory_setup %>
