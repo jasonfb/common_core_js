@@ -1,12 +1,44 @@
 require 'rails/generators/erb/scaffold/scaffold_generator'
 require 'ffaker'
 
+
+
 module CommonCore
+
+  module GeneratorHelper
+    def text_area_output(col, field_length)
+      lines = field_length % 40
+      if lines > 5
+        lines = 5
+      end
+
+      ".row
+  .form-group.col-md-4
+    = f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}'
+    %label.form-text
+      #{col.to_s.humanize}\n"
+    end
+
+
+
+    def field_output(col, type = nil, width)
+      ".row
+  .form-group.col-md-4
+    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
+    %label.form-text
+      #{col.to_s.humanize}\n"
+    end
+  end
+
+
   class ScaffoldGenerator < Erb::Generators::ScaffoldGenerator
     hook_for :form_builder, :as => :scaffold
 
     source_root File.expand_path('templates', __dir__)
     attr_accessor :path, :singular, :plural, :singular_class, :nest_with
+
+
+    include GeneratorHelper
 
 
     def initialize(*meta_args) #:nodoc:
@@ -19,12 +51,7 @@ module CommonCore
         exit
       end
 
-      begin
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|x| x==:updated_at || x==:created_at || x==:id}
-      rescue StandardError => e
-        puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
-        exit
-      end
+
 
       args = meta_args[0]
       @singular = args[0].tableize.singularize # should be in form hello_world
@@ -54,6 +81,18 @@ module CommonCore
         when "auth_identifier"
           @auth_identifier = var_value || ""
         end
+      end
+
+      auth_assoc = @auth.gsub("current_","")
+      auth_assoc_field = auth_assoc + "_id"
+
+
+      begin
+        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| field==:updated_at ||
+            field==:created_at || field==:id ||  field == auth_assoc_field.to_sym }
+      rescue StandardError => e
+        puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
+        exit
       end
 
       flags = meta_args[1]
@@ -323,9 +362,7 @@ module CommonCore
 
     def all_form_fields
       res = @columns.map { |col|
-        # if eval("#{singular_class}.columns_hash['#{col}']").nil?
-        #   byebug
-        # end
+
 
         type = eval("#{singular_class}.columns_hash['#{col}']").type
         limit = eval("#{singular_class}.columns_hash['#{col}']").limit
@@ -335,46 +372,68 @@ module CommonCore
         when :integer
           # look for a belongs_to on this object
           if col.to_s.ends_with?("_id")
+            # guess the association name label
+
 
             assoc_name = col.to_s.gsub("_id","")
-            assoc = eval("#{singular_class}.reflect_on_association(':#{assoc_name}')")
+            assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
+            if assoc.nil?
+              puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+              exit
+            end
+
+            if assoc.active_record.column_names.include?("name")
+              display_column = "name"
+            elsif assoc.active_record.column_names.include?("to_label")
+              display_column = "to_label"
+            elsif assoc.active_record.column_names.include?("full_name")
+              display_column = "full_name"
+            elsif assoc.active_record.column_names.include?("display_name")
+              display_column = "display_name"
+            elsif assoc.active_record.column_names.include?("email")
+              display_column = "email"
+            end
+
             ".row
   .form-group.col-md-4
-    = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :to_label, {:prompt => true}, class: 'form-control')
+    = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} , class: 'form-control')
     %label.small.form-text.text-muted
       #{col.to_s.humanize}"
 
           else
             ".row
   .form-group.col-md-4
-    = f.text_field :#{col.to_s}, class: 'form-control', size: 4, type: 'number'
+    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
     %label.form-text
       #{col.to_s.humanize}\n"
           end
         when :string
-          width = (limit && limit < 40) ? limit : (40)
-          ".row
-  .form-group.col-md-4
-    = f.text_field :#{col.to_s}, size: #{width}, class: 'form-control'
-    %label.form-text
-      #{col.to_s.humanize}\n"
+          limit ||= 40
+          if limit < 50
+            field_output(col, nil, limit)
+          else
+            text_area_output(col, limit)
+          end
+
         when :text
-          # width = (limit && limit < 40) ? limit :  (40)
-          ".row
-  .form-group.col-md-4
-    = f.text_area :#{col.to_s}, rows: 4, cols: 40, class: 'form-control'
-    %label.form-text
-      #{col.humanize}\n"
-          when :datetime
+          limit ||= 40
+          if limit < 50
+            field_output(col, nil, limit)
+          else
+            text_area_output(col, limit)
+          end
+
+        when :datetime
             ".row
   .form-group.col-md-4
-    = f.text_field :#{col.to_s}, class: 'form-control', type: 'datetime-local'
+    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, class: 'form-control', type: 'datetime-local'
     %label.form-text
       #{col.to_s.humanize}\n"
           end
       }.join("\n")
       return res
     end
+
 
     def all_line_fields
       res = "%tr{'data-id': #{singular}.id, 'data-edit': 'false'}\n"
@@ -395,7 +454,8 @@ module CommonCore
             assoc = eval("#{singular_class}.reflect_on_association(:#{assoc_name})")
 
             if assoc.nil?
-              raise "can't find assocation for #{assoc_name}"
+              puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
+              exit
             end
 
             "  %td
