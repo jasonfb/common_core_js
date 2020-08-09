@@ -410,16 +410,16 @@ module CommonCore
       #{col.to_s.humanize}\n"
           end
         when :string
-          limit ||= 40
-          if limit < 50
+          limit ||= 256
+          if limit < 256
             field_output(col, nil, limit)
           else
             text_area_output(col, limit)
           end
 
         when :text
-          limit ||= 40
-          if limit < 50
+          limit ||= 256
+          if limit < 256
             field_output(col, nil, limit)
           else
             text_area_output(col, limit)
@@ -428,15 +428,15 @@ module CommonCore
         when :datetime
           ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = datetime_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
+    = datetime_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :date
         ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = date_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
+    = date_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :time
           ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = time_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
+    = time_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
 
       end
 
@@ -499,7 +499,7 @@ module CommonCore
         when :datetime
           "  %td
     - unless #{singular}.#{col}.nil?
-      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + human_timezone(Time.now, current_timezone)
+      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + timezonize(current_timezone)
     - else
       %span.alert-danger
         MISSING
@@ -515,7 +515,7 @@ module CommonCore
         when :time
           "  %td
     - unless #{singular}.#{col}.nil?
-      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + human_timezone(Time.now, current_timezone)
+      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + timezonize(current_timezone)
     - else
       %span.alert-danger
         MISSING
@@ -526,6 +526,14 @@ module CommonCore
       return res
     end
 
+
+    def controller_descends_from
+      if defined?(@namespace.titlecase + "::BaseController")
+        @namespace.titlecase + "::BaseController"
+      else
+        "ApplicationController"
+      end
+    end
 
 
     private # thor does something fancy like sending the class all of its own methods during some strange run sequence
