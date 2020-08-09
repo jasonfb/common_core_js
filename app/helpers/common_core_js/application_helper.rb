@@ -22,7 +22,7 @@ module CommonCoreJs
 
       res << form_object.text_field(field_name, class: 'form-control',
                                     type: 'date',
-                                    value: date_to_current_timezone(value, timezone))
+                                    value: value )
 
       res
     end

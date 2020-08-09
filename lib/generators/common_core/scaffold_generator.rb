@@ -13,7 +13,7 @@ module CommonCore
       end
 
       ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = f.text_area :#{col.to_s}, class: 'form-control', cols: 40, rows: '#{lines}'
     %label.form-text
       #{col.to_s.humanize}\n"
@@ -23,7 +23,7 @@ module CommonCore
 
     def field_output(col, type = nil, width)
       ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, size: #{width}, class: 'form-control', type: '#{type}'
     %label.form-text
       #{col.to_s.humanize}\n"
@@ -397,14 +397,14 @@ module CommonCore
             end
 
             ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
     = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
     %label.small.form-text.text-muted
       #{col.to_s.humanize}"
 
           else
             ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, class: 'form-control', size: 4, type: 'number'
     %label.form-text
       #{col.to_s.humanize}\n"
@@ -427,15 +427,15 @@ module CommonCore
 
         when :datetime
           ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = datetime_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
         when :date
         ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = date_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
         when :time
           ".row
-  .form-group.col-md-4
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
     = time_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
 
       end
@@ -510,6 +510,7 @@ module CommonCore
       = #{singular}.#{col}
     - else
       %span.alert-danger
+        MISSING
 "
         when :time
           "  %td
@@ -517,6 +518,7 @@ module CommonCore
       = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + human_timezone(Time.now, current_timezone)
     - else
       %span.alert-danger
+        MISSING
 "
 
         end
