@@ -22,6 +22,7 @@ class <%= controller_class_name %> < ApplicationController
   def load_<%= singular_name %>
     @<%= singular_name %> = <%= object_scope %>.find(params[:id])
   end
+  include CommonCoreJs::ControllerHelpers
 
   def index
     @<%= plural_name %> = <%= object_scope %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
@@ -40,14 +41,14 @@ class <%= controller_class_name %> < ApplicationController
   end
 
   def create
-    @<%=singular_name %> = <%=class_name %>.create(<%=singular_name %>_params<% if !create_merge_params.empty? %>.merge!(<%= create_merge_params %>)<%end%>)
+    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !create_merge_params.empty? %>.merge!(<%= create_merge_params %><%end%> ), <%=@auth%>)
+    @<%=singular_name %> = <%=class_name %>.create(modified_params)
     respond_to do |format|
       if @<%= singular_name %>.save
-        format.js
       else
         flash[:alert] = "Oops, your <%=singular_name %> could not be saved."
-        format.js
       end
+      format.js
     end
   end
 
@@ -65,7 +66,7 @@ class <%= controller_class_name %> < ApplicationController
 
   def update
     respond_to do |format|
-      if !@<%=singular_name %>.update(<%= singular %>_params)
+      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params, <%=@auth%> ))
         flash[:alert] = "<%=singular_name.titlecase %> could not be saved"
       end
       format.js {}

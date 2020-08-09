@@ -146,6 +146,8 @@ module CommonCore
       unless @no_specs
         template "controller_spec.rb", File.join("spec/controllers#{namespace_with_dash}", "#{plural}_controller_spec.rb")
       end
+
+      template "_errors.haml", File.join("app/views#{namespace_with_dash}", "_errors.haml")
     end
 
     def list_column_headings
@@ -396,7 +398,7 @@ module CommonCore
 
             ".row
   .form-group.col-md-4
-    = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} , class: 'form-control')
+    = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
     %label.small.form-text.text-muted
       #{col.to_s.humanize}"
 
@@ -424,13 +426,21 @@ module CommonCore
           end
 
         when :datetime
-            ".row
+          ".row
   .form-group.col-md-4
-    = f.text_field :#{col.to_s}, value: @#{singular}.#{col.to_s}, class: 'form-control', type: 'datetime-local'
-    %label.form-text
-      #{col.to_s.humanize}\n"
-          end
-      }.join("\n")
+    = datetime_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
+        when :date
+        ".row
+  .form-group.col-md-4
+    = date_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
+        when :time
+          ".row
+  .form-group.col-md-4
+    = time_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth}.timezone)"
+
+      end
+
+    }.join("\n")
       return res
     end
 
@@ -458,8 +468,22 @@ module CommonCore
               exit
             end
 
+            if assoc.active_record.column_names.include?("name")
+              display_column = "name"
+            elsif assoc.active_record.column_names.include?("to_label")
+              display_column = "to_label"
+            elsif assoc.active_record.column_names.include?("full_name")
+              display_column = "full_name"
+            elsif assoc.active_record.column_names.include?("display_name")
+              display_column = "display_name"
+            elsif assoc.active_record.column_names.include?("email")
+              display_column = "email"
+            else
+              puts "cant find any column to use as label for #{assoc.name.to_s}; any of name, to_labe, full_name, display_name, or email"
+            end
+
             "  %td
-    = #{singular}.#{assoc.name.to_s}.to_label"
+    = #{singular}.#{assoc.name.to_s}.#{display_column}"
 
           else
             "  %td
@@ -474,7 +498,27 @@ module CommonCore
     = #{singular}.#{col}"
         when :datetime
           "  %td
-    = #{singular}.#{col}"
+    - unless #{singular}.#{col}.nil?
+      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%m/%d/%Y @ %l:%M %p ') + human_timezone(Time.now, current_timezone)
+    - else
+      %span.alert-danger
+        MISSING
+"
+        when :date
+          "  %td
+    - unless #{singular}.#{col}.nil?
+      = #{singular}.#{col}
+    - else
+      %span.alert-danger
+"
+        when :time
+          "  %td
+    - unless #{singular}.#{col}.nil?
+      = #{singular}.#{col}.in_time_zone(current_timezone).strftime('%l:%M %p ') + human_timezone(Time.now, current_timezone)
+    - else
+      %span.alert-danger
+"
+
         end
       }.join("\n")
       return res

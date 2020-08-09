@@ -10,12 +10,11 @@ module CommonCore
 
     def initialize(*args) #:nodoc:
       super
-
-      copy_file "common_core.js", "vendor/assets/javascripts/common_core.js"
-      copy_file "common_core.scss", "vendor/assets/stylesheets/common_core.scss"
+      copy_file "common_core.js", "app/javascript/common_core.js"
+      copy_file "common_core.scss", "app/assets/stylesheets/common_core.scss"
+      copy_file "_flash_notices.haml", "app/views/layouts/_flash_notices.haml"
 
     end
-
   end
 end
 

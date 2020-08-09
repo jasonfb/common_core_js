@@ -8,7 +8,7 @@
 
 <% if object.errors.any? %>
 $(".flash-notices").html("<%= j render 'layouts/flash_notices' %>");
-$("<%= (scope + " ") if controller.common_scope %> .new-<%=singular%>-form").html("<%= j render(partial: '#{controller.namespace}errors', locals: {resource: object}) %>")
+$("<%= (scope + " ") if controller.common_scope %> .new-<%=singular%>-form").html('<%= j render(partial: "#{controller.namespace}errors", locals: {resource: object}) %>')
 $("<%= (scope + " ") if controller.common_scope %> .new-<%=singular%>-form").append("<%= j render(partial: "new", locals: { singular.to_sym => object}) %><i class='fa fa-times-circle fa-2x' data-name='<%=singular%>' data-role='close-button' />").slideDown();
 <% else %>
 $("<%= (scope + " ") if controller.common_scope %> .new-<%=singular%>-form").slideUp();
