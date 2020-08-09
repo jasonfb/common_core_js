@@ -1,6 +1,7 @@
 <% if object.errors.any? %>
 <% pass_through_locals ||= {} %>
-$(".<%= singular %>-table tr[data-id=<%= object.id %>][data-edit='true']").html("<%= j render(partial: '#{controller.namespace}errors', locals: {resource: object}) %><%= j render partial: 'edit', locals: {singular.to_sym => object, url: url, colspan: controller.default_colspan}.merge(pass_through_locals || {}) %>")
+$(".<%= singular %>-table tr[data-id=<%= object.id %>][data-edit='true']").html("<%= j render partial: 'edit', locals: {singular.to_sym => object, url: url, colspan: controller.default_colspan}.merge(pass_through_locals || {}) %>")
+
 $(".flash-notices").html("<%= j render 'layouts/flash_notices' %>");
 <% else %>
 $(".<%= singular %>-table tr[data-id=<%= object.id %>]:not([data-edit='true'])").replaceWith("<%= j render partial: 'line', locals: {singular.to_sym => object } %>").fadeIn()

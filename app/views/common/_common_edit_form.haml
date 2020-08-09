@@ -1,4 +1,8 @@
 %td{style: "position: relative;", colspan: controller.default_colspan}
+  - if object.errors.any?
+    = render(partial: "#{controller.namespace}errors", locals: {resource: object})
+
+
   Editing
   - if object.try(:to_label)
     = object.to_label
