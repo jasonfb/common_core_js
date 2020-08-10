@@ -11,7 +11,7 @@ No, I would not use this to build an intricate app. Yes, it's a great tool for p
 ## THE SALES PITCH:
 * Build plug-and-play scaffolding mixing HAML with jQuery-based Javascript
 * Automatically Reads Your Models (make them before building your scaffolding!)
-* Excellent for CRUD, lists with pagination, searching, sorting.
+* Excellent for CRUD, lists with pagination, searching, ~~sorting.~~
 * Wonderful for prototyping.
 * Plays nicely with Devise, Kaminari, Haml-Rails, Rspec.
 * Create specs autoamatically along with the controllers.
