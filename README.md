@@ -14,13 +14,13 @@ No, I would not use this to build an intricate app. Yes, it's a great tool for p
 * Excellent for CRUD, lists with pagination, searching, ~~sorting.~~
 * Wonderful for prototyping.
 * Plays nicely with Devise, Kaminari, Haml-Rails, Rspec.
-* Create specs autoamatically along with the controllers.
+* Create specs automatically along with the controllers.
 * Nest your routes model-by-model for built-in poor man's authentication
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
 ## THE BLOG POST
 
-It's really easy to get started by following along wit this blog post that creates three simple tables (User, Event, and Format).
+It's really easy to get started by following along with this blog post that creates three simple tables (User, Event, and Format).
 
 Feel free to build your own tables when you get to the sections for building the 'Event' scaffold:
 
