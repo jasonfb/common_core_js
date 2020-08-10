@@ -282,7 +282,9 @@ module CommonCore
 
     def all_objects_root
       if @auth
-        if @nested_args.none?
+        if @self_auth
+          @singular_class + ".where(id: #{@auth}.id)"
+        elsif @nested_args.none?
           @auth + ".#{plural}"
         else
           "@" + @nested_args.last + ".#{plural}"
@@ -406,6 +408,8 @@ module CommonCore
               display_column = "display_name"
             elsif assoc.active_record.column_names.include?("email")
               display_column = "email"
+            else
+              puts "Can't find a display_column on {singular_class} object"
             end
 
             ".row
@@ -423,7 +427,7 @@ module CommonCore
           end
         when :string
           limit ||= 256
-          if limit < 256
+          if limit <= 256
             field_output(col, nil, limit)
           else
             text_area_output(col, limit)
@@ -431,7 +435,7 @@ module CommonCore
 
         when :text
           limit ||= 256
-          if limit < 256
+          if limit <= 256
             field_output(col, nil, limit)
           else
             text_area_output(col, limit)
@@ -545,6 +549,17 @@ module CommonCore
       else
         "ApplicationController"
       end
+    end
+
+
+    def destroy_action
+      return false if @self_auth
+      return true
+    end
+
+    def create_action
+      return false if @self_auth
+      return true
     end
 
 

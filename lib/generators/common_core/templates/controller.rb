@@ -7,6 +7,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   before_action :load_<%= arg %><% end %> <% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   helper :common_core
+  include CommonCoreJs::ControllerHelpers
 
   <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each do |arg| %>
       <% if nest_chain.empty?
@@ -19,27 +20,29 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     @<%= arg %> = <%= this_scope %>.find(params[:<%= arg %>_id])
   end<% end %> <% end %>
 
-  <% if !@self_auth %>
+
+<% if !@self_auth %>
   def load_<%= singular_name %>
     @<%= singular_name %> = <%= object_scope %>.find(params[:id])
   end
   <% else %>
-    def load_<%= singular_name %>
-      @<%= singular_name %> = <%= auth_object %>
-    end
-  <% end %>
+  def load_<%= singular_name %>
+    @<%= singular_name %> = <%= auth_object %>
+  end<% end %>
 
   def index
 <% if !@self_auth %>
     @<%= plural_name %> = <%= object_scope %><% if model_has_strings? %>.where(<%=class_name %>.arel_table[:email].matches("%#{@__general_string}%"))<% end %>.page(params[:page])
-  <% end %>
+    <% else %>
+    @<%= plural_name %> = [<%= auth_object %>]
+    <% end %>
     respond_to do |format|
       format.js<% if @with_index %>
       format.html {render 'all.haml'}<% end %>
     end
   end
 
-<% if !@self_auth %>  def new
+<% if create_action %>  def new
     @<%= singular_name %> = <%= class_name  %>.new(<%= create_merge_params %>)
     respond_to do |format|
       format.js
@@ -72,14 +75,14 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def update
     respond_to do |format|
-      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params ))
+      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params, <%= @auth ? @auth : "nil" %>  ))
         flash[:alert] = "<%=singular_name.titlecase %> could not be saved"
       end
       format.js {}
     end
   end
 
-  def destroy
+<% if destroy_action %>def destroy
     respond_to do |format|
       begin
         @<%=singular_name%>.destroy
@@ -88,7 +91,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
       end
       format.js {}
     end
-  end
+  end<% end %>
 
   def <%=singular_name%>_params
     params.require(:<%=singular_name%>).permit( <%= @columns %> )

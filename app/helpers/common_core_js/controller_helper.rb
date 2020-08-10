@@ -1,15 +1,7 @@
-require "common_core_js/engine"
-
-require 'kaminari'
-require 'haml-rails'
-
-
 module CommonCoreJs
-  # Your code goes here...
-  #
-  module ControllerHelpers
-    def modify_date_inputs_on_params(modified_params, authenticated_user = nil)
-      use_timezone = authenticated_user.timezone || Time.now.strftime("%z")
+  module ControllerHelper
+    def modify_date_inputs_on_params(modified_params)
+      use_timezone = current_account.timezone || Time.now.strftime("%z")
 
       modified_params = modified_params.tap do |params|
         params.keys.each{|k|
