@@ -83,13 +83,17 @@ module CommonCore
         end
       end
 
+
+
       auth_assoc = @auth.gsub("current_","")
       auth_assoc_field = auth_assoc + "_id"
 
 
+
+      exclude_fields = [auth_assoc_field.to_sym, :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
+                        :reset_password_sent_at, :remember_created_at]
       begin
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| field==:updated_at ||
-            field==:created_at || field==:id ||  field == auth_assoc_field.to_sym }
+        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| exclude_fields.include?(field) }
       rescue StandardError => e
         puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
         exit
@@ -118,6 +122,11 @@ module CommonCore
         @auth_identifier = @auth.gsub("current_", "")
       end
 
+
+      if auth_identifier == @singular
+        @self_auth = true
+      end
+
       if !@nest.nil?
         @nested_args = @nest.split("/")
 
@@ -141,6 +150,9 @@ module CommonCore
 
       unless @specs_only
         template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
+        if @namespace
+          template "base_controller.rb", File.join("app/controllers#{namespace_with_dash}", "base_controller.rb")
+        end
       end
 
       unless @no_specs
@@ -346,7 +358,7 @@ module CommonCore
 
 
     def create_merge_params
-      if @auth
+      if @auth && ! @self_auth
         "#{@auth_identifier}: #{@auth}"
       else
         ""
