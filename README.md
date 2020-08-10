@@ -8,7 +8,7 @@ Yes, it's opinionated. Yes, it's metaprogramming. A lot of metaprogramming. Ruby
 No, I would not use this to build an intricate app. Yes, it's a great tool for prototyping. Yes, I think prototyping is a lost art. 
 
 
-= THE SALES PITCH:
+## THE SALES PITCH:
 * Build plug-and-play scaffolding mixing HAML with jQuery-based Javascript
 * Automatically Reads Your Models (make them before building your scaffolding!)
 * Excellent for CRUD, lists with pagination, searching, sorting.
@@ -18,7 +18,7 @@ No, I would not use this to build an intricate app. Yes, it's a great tool for p
 * Nest your routes model-by-model for built-in poor man's authentication
 * Throw the scaffolding away when your app is ready to graduate to its next phase.
 
-= THE BLOG POST
+## THE BLOG POST
 
 It's really easy to get started by following along wit this blog post that creates three simple tables (User, Event, and Format).
 
@@ -26,14 +26,14 @@ Feel free to build your own tables when you get to the sections for building the
 
 https://blog.jasonfleetwoodboldt.com/common-core-js
 
-= HOW EASY?
+## HOW EASY?
 
 
 ```
 rails generate common_core:scaffold Thing 
 ```
 
-= TO INSTALL
+## TO INSTALL
 
 - Add common_core_js to your Gemfile
 
