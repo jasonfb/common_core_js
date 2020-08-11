@@ -50,7 +50,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
   def create
-    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !create_merge_params.empty? %>.merge!(<%= create_merge_params %>)<%end%> , <%= @auth ? @auth : "nil" %>)
+    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !create_merge_params.empty? %>.merge!(<%= create_merge_params %>)<% end %> <%= @auth ? ",#{@auth}" : "" %>)
     @<%=singular_name %> = <%=class_name %>.create(modified_params)
     respond_to do |format|
       if @<%= singular_name %>.save

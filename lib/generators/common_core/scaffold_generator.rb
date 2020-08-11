@@ -91,7 +91,8 @@ module CommonCore
 
 
       exclude_fields = [auth_assoc_field.to_sym, :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
-                        :reset_password_sent_at, :remember_created_at]
+                        :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at,
+                        :confirmation_sent_at, :unconfirmed_email]
       begin
         @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| exclude_fields.include?(field) }
       rescue StandardError => e
@@ -123,7 +124,8 @@ module CommonCore
       end
 
 
-      if auth_identifier == @singular
+
+      if @auth && auth_identifier == @singular
         @self_auth = true
       end
 
@@ -150,7 +152,7 @@ module CommonCore
 
       unless @specs_only
         template "controller.rb", File.join("app/controllers#{namespace_with_dash}", "#{plural}_controller.rb")
-        if @namespace
+        if @namespace &&  defined?(controller_descends_from) == nil
           template "base_controller.rb", File.join("app/controllers#{namespace_with_dash}", "base_controller.rb")
         end
       end
@@ -299,8 +301,12 @@ module CommonCore
     end
 
     def all_objects_variable
+
       # needs the authenticated root user
-      "#{@auth}.#{ @nested_args.map{|a| "#{@nested_args_plural[a]}.find(@#{a})"}.join('.') + "." if @nested_args.any?}#{plural}"
+      # "#{@auth}.#{ @nested_args.map{|a| "#{@nested_args_plural[a]}.find(@#{a})"}.join('.') + "." if @nested_args.any?}#{plural}"
+
+      all_objects_root + ".page(params[:page])"
+
     end
 
     def auth_object
