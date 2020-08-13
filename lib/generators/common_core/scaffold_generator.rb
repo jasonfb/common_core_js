@@ -83,12 +83,8 @@ module CommonCore
         end
       end
 
-
-
       auth_assoc = @auth.gsub("current_","")
       auth_assoc_field = auth_assoc + "_id"
-
-
 
       exclude_fields = [auth_assoc_field.to_sym, :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
                         :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at,
@@ -99,6 +95,9 @@ module CommonCore
         puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
         exit
       end
+
+      @no_delete = false
+      @no_create = false
 
       flags = meta_args[1]
       flags.each do |f|
@@ -111,6 +110,10 @@ module CommonCore
           @specs_only = true
         when "--no-specs"
           @no_specs = true
+        when "--no-delete"
+          @no_delete = true
+        when "--no-create"
+          @no_create = true
         end
       end
 
@@ -122,7 +125,6 @@ module CommonCore
       if @auth_identifier.nil? && !@auth.nil?
         @auth_identifier = @auth.gsub("current_", "")
       end
-
 
 
       if @auth && auth_identifier == @singular
@@ -560,12 +562,12 @@ module CommonCore
 
     def destroy_action
       return false if @self_auth
-      return true
+      return !@no_delete
     end
 
     def create_action
       return false if @self_auth
-      return true
+      return !@no_create
     end
 
 

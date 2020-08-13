@@ -7,7 +7,6 @@ module CommonCoreHelper
 
 
     def datetime_field_localized(form_object, field_name, value, label, timezone = nil )
-
       res = form_object.label(label,
                               field_name,
                               class: 'small form-text text-muted')
@@ -22,6 +21,7 @@ module CommonCoreHelper
 
 
     def date_field_localized(form_object, field_name, value, label, timezone = nil )
+
       res = form_object.label(label,
                               field_name,
                               class: 'small form-text text-muted')
@@ -51,7 +51,7 @@ module CommonCoreHelper
         controller.current_timezone
       elsif defined?(current_user)
         if current_user.try(:timezone)
-          Time.now.in_time_zone(current_user.timezone).strftime("%z").to_i/100
+          Time.now.in_time_zone(current_user.timezone.to_i).strftime("%z").to_i/100
         else
           Time.now.strftime("%z").to_i/100
         end
@@ -62,7 +62,6 @@ module CommonCoreHelper
 
 
     def date_to_current_timezone(date, timezone = nil)
-
       # if the timezone is nil, use the server date'
       if timezone.nil?
         timezone = Time.now.strftime("%z").to_i/100
