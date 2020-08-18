@@ -84,17 +84,6 @@ module CommonCore
       end
 
       auth_assoc = @auth.gsub("current_","")
-      auth_assoc_field = auth_assoc + "_id"
-
-      exclude_fields = [auth_assoc_field.to_sym, :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
-                        :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at,
-                        :confirmation_sent_at, :unconfirmed_email]
-      begin
-        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| exclude_fields.include?(field) }
-      rescue StandardError => e
-        puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
-        exit
-      end
 
       @no_delete = false
       @no_create = false
@@ -122,23 +111,56 @@ module CommonCore
         exit
       end
 
+
+      # only used for the before_action
       if @auth_identifier.nil? && !@auth.nil?
         @auth_identifier = @auth.gsub("current_", "")
       end
 
-
+      # when in self auth, the object is the same as the authenticated object
       if @auth && auth_identifier == @singular
         @self_auth = true
       end
 
       if !@nest.nil?
         @nested_args = @nest.split("/")
-
         @nested_args_plural = {}
         @nested_args.each do |a|
           @nested_args_plural[a] = a + "s"
         end
       end
+
+      # the @object_owner will always be object that will 'own' the object
+      # for new and create
+
+      if @auth && ! @self_auth && @nested_args.none?
+         @object_owner_sym = @auth.gsub("current_", "").to_sym
+         @object_owner_eval = @auth
+      else
+        @object_owner_sym = @nested_args.last.to_sym
+        @object_owner_eval = "@#{@nested_args.last}"
+      end
+
+
+
+      # create the columns
+      auth_assoc_field = auth_assoc + "_id"
+
+      ownership_field = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})").name.to_s + "_id"
+
+
+      exclude_fields = [auth_assoc_field.to_sym, ownership_field.to_sym, :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
+                        :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at,
+                        :confirmation_sent_at, :unconfirmed_email]
+      begin
+        @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| exclude_fields.include?(field) }
+      rescue StandardError => e
+        puts "Ooops... it looks like is an object for #{class_name}. Please create the database table with fields first. "
+        exit
+      end
+
+
+
     end
 
     def formats
@@ -239,6 +261,14 @@ module CommonCore
     end
 
 
+    def path_helper_full
+      "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
+    end
+
+    def path_helper_args
+      [(@nested_args if @nested_args.any?).collect{|a| "@#{a}"} , singular].join(",")
+    end
+
     def path_helper_singular
       "#{@namespace+"_" if @namespace}#{(@nested_args.join("_") + "_" if @nested_args.any?)}#{singular}_path"
     end
@@ -268,7 +298,7 @@ module CommonCore
     end
 
     def nested_arity_for_path
-      @nested_args.join(", ") #metaprgramming into arity for the Rails path helper
+      [@nested_args[0..-1].collect{|a| "@#{a}"}].join(", ") #metaprgramming into arity for the Rails path helper
     end
 
     def object_scope
@@ -366,15 +396,6 @@ module CommonCore
       :erb
     end
 
-
-    def create_merge_params
-      if @auth && ! @self_auth
-        "#{@auth_identifier}: #{@auth}"
-      else
-        ""
-      end
-    end
-
     def model_has_strings?
       false
     end
@@ -405,6 +426,7 @@ module CommonCore
               puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               exit
             end
+            assoc_class_name = eval("#{singular_class}.reflect_on_association(:#{assoc_name})").class_name
 
             if assoc.active_record.column_names.include?("name")
               display_column = "name"
@@ -420,9 +442,10 @@ module CommonCore
               puts "Can't find a display_column on {singular_class} object"
             end
 
+
             ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
-    = f.collection_select(:#{col.to_s}, #{assoc_name.titleize}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
+    = f.collection_select(:#{col.to_s}, #{assoc_class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
     %label.small.form-text.text-muted
       #{col.to_s.humanize}"
 

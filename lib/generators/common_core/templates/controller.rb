@@ -1,5 +1,5 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
-<% unless @auth_identifier.nil? %>
+<% unless @auth_identifier == '' %>
   before_action :authenticate_<%= auth_identifier %>!
 
 <% end %>
@@ -43,14 +43,14 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
   end
 
 <% if create_action %>  def new
-    @<%= singular_name %> = <%= class_name  %>.new(<%= create_merge_params %>)
+    @<%= singular_name %> = <%= class_name  %>.new(<%= @object_owner_sym %>: <%= @object_owner_eval %>)
     respond_to do |format|
       format.js
     end
   end
 
   def create
-    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !create_merge_params.empty? %>.merge!(<%= create_merge_params %>)<% end %> <%= @auth ? ",#{@auth}" : "" %>)
+    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !@object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %>, <%= @auth %>)
     @<%=singular_name %> = <%=class_name %>.create(modified_params)
     respond_to do |format|
       if @<%= singular_name %>.save
@@ -75,7 +75,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def update
     respond_to do |format|
-      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params, <%= @auth ? @auth : "nil" %>  ))
+      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params, <%= @auth %>  ))
         flash[:alert] = "<%=singular_name.titlecase %> could not be saved"
       end
       format.js {}
