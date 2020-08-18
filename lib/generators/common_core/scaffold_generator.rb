@@ -475,16 +475,27 @@ module CommonCore
         when :datetime
           ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = datetime_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+    = datetime_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :date
         ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = date_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+    = date_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
         when :time
           ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
-    = time_field_localized(f, :#{col.to_s}, @#{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+    = time_field_localized(f, :#{col.to_s}, #{singular}.#{col.to_s}, '#{col.to_s.humanize}', #{@auth ? @auth+'.timezone' : 'nil'})"
+        when :boolean
+          ".row
+  %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{col.to_s})}\"}
+    %span
+      #{col.to_s.humanize}
+    = f.radio_button(:#{col.to_s},  '0', checked: #{singular}.#{col.to_s}  ? '' : 'checked')
+    = f.label(:#{col.to_s}, value: 'No', for: '#{singular}_#{col.to_s}_0')
 
+    = f.radio_button(:#{col.to_s}, '1',  checked: #{singular}.#{col.to_s}  ? 'checked' : '')
+    = f.label(:#{col.to_s}, value: 'Yes', for: '#{singular}_#{col.to_s}_1')
+
+      "
       end
 
     }.join("\n")
@@ -567,7 +578,16 @@ module CommonCore
       %span.alert-danger
         MISSING
 "
-
+        when :boolean
+          "  %td
+    - if #{singular}.#{col}.nil?
+      %span.alert-danger
+        MISSING
+    - elsif #{singular}.#{col}
+      YES
+    - else
+      NO
+"
         end
       }.join("\n")
       return res
