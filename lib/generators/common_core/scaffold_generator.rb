@@ -530,7 +530,7 @@ module CommonCore
             end
 
             "  %td
-    = #{singular}.#{assoc.name.to_s}.#{display_column}"
+    = #{singular}.#{assoc.name.to_s}.try(:#{display_column}) || '<span class=\"content alert-danger\">MISSING</span>'.html_safe"
 
           else
             "  %td
