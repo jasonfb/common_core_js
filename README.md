@@ -50,7 +50,7 @@ rails generate common_core:scaffold Thing
 
 Note that the arguments are not preceeded by dashes and are followed by equal sign and the input you are giving.
 
-Flags take two dashes (--) and do not take any value. 
+Flags take two dashes (--) and do not take any value. Always pass options first, followed by the flags (or else your options won't work!)
 
 ### First Argument
  
@@ -58,7 +58,7 @@ TitleCase class name of the thing you want to build a scaffoling for.
 
 ### `namespace=`
 
-pass `namespace=` as a flag to denote a namespace to apply to the Rails path helpers
+pass `namespace=` as an option to denote a namespace to apply to the Rails path helpers
 
 
 `rails generate common_core:scaffold Thing namespace=dashboard`
@@ -82,7 +82,7 @@ end
 
 ### `nest=`
 
-pass `nest=` as a flag to denote a nested resources
+pass `nest=` to denote a nested resources
 
 
 `rails generate common_core:scaffold Line nest=invoice`
@@ -139,7 +139,7 @@ When you display anything built with the scaffolding, we assume the `current_use
 
 If you use Devise, you probably already have a `current_user` method available in your controllers. If you don't use Devise, you can implement it in your ApplicationController.
 
-If you use a different object other than "User" for authentication, override using the `auth` flag. 
+If you use a different object other than "User" for authentication, override using the `auth` option. 
 
  `rails generate common_core:scaffold Thing auth=current_account`
 
@@ -209,7 +209,7 @@ You don't need this if the pluralized version is just + "s" of the singular vers
 
 Use this flag to create controllers with no root authentication. You can still use an auth_identifier, which can be useful for a meta-leval authentication to the controoler.
 
-For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use --god flag
+For example, FOR ADMIN CONTROLLERS ONLY, supply a auth_identifier and use `--god` flag
 
 In God mode, the objects are loaded directly from the base class (these controllers have full access)
 ```
@@ -293,3 +293,10 @@ environment.plugins.prepend('Provide',
 module.exports = environment
 
 ```
+
+
+# ACKNOWLEDGEMENTS
+
+### "POOR MAN"
+
+I hope one day I will leave this Earth a poor man (like my code) owning only the most simple structure for the simple form of my existence. Thanks for having educated me in this wisdom goes to @trak3r! 
