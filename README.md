@@ -299,4 +299,4 @@ module.exports = environment
 
 ### "POOR MAN"
 
-I hope one day I will leave this Earth a poor man (like my code) owning only the most simple structure for the simple form of my existence. Thanks for having educated me in this wisdom goes to [link to @trak3r](https://github.com/trak3r)! 
+I hope one day I will leave this Earth a poor man (like my code) owning only the most simple structure for the simple form of my existence. Thanks for having educated me in this wisdom goes to my former mentor [@trak3r](https://github.com/trak3r)! 
