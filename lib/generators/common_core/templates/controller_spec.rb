@@ -10,7 +10,7 @@ describe <%= controller_class_name %> do
   before(:each) do
     @request.env["devise.mapping"] = Devise.mappings[:account]
 
-    sign_in <%= @auth %>, scope: :<%= @auth_identifier %>
+    sign_in <%= @auth %>, scope: :<%= @auth %>
   end
 
   describe "index" do

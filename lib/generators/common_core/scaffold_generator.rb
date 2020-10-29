@@ -68,6 +68,7 @@ module CommonCore
 
       args[1..-1].each do |a|
         var_name, var_value = a.split("=")
+        puts var_name
         case (var_name)
 
         when "plural"
@@ -137,21 +138,39 @@ module CommonCore
          @object_owner_sym = @auth.gsub("current_", "").to_sym
          @object_owner_eval = @auth
       else
-        @object_owner_sym = @nested_args.last.to_sym
-        @object_owner_eval = "@#{@nested_args.last}"
+
+        if @nested_args.any?
+          @object_owner_sym = @nested_args.last.to_sym
+          @object_owner_eval = "@#{@nested_args.last}"
+        else
+          @object_owner_sym = ""
+          @object_owner_eval = ""
+        end
       end
 
 
 
       # create the columns
-      auth_assoc_field = auth_assoc + "_id"
+      if !@object_owner_sym.empty?
+        auth_assoc_field = auth_assoc + "_id"
+        assoc = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})")
+        if assoc
+          ownership_field = assoc.name.to_s + "_id"
+        else
+          puts "Ooops... it looks like is no association for #{@object_owner_sym} on #{singular_class} "
+          exit
+        end
+      end
 
-      ownership_field = eval("#{singular_class}.reflect_on_association(:#{@object_owner_sym})").name.to_s + "_id"
 
-
-      exclude_fields = [auth_assoc_field.to_sym, ownership_field.to_sym, :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
+      exclude_fields = [ :id, :created_at, :updated_at, :encrypted_password, :reset_password_token,
                         :reset_password_sent_at, :remember_created_at, :confirmation_token, :confirmed_at,
                         :confirmation_sent_at, :unconfirmed_email]
+
+      exclude_fields << auth_assoc_field.to_sym if !auth_assoc_field.nil?
+      exclude_fields <<  ownership_field.to_sym if !ownership_field.nil?
+
+
       begin
         @columns = object.columns.map(&:name).map(&:to_sym).reject{|field| exclude_fields.include?(field) }
       rescue StandardError => e
@@ -266,7 +285,7 @@ module CommonCore
     end
 
     def path_helper_args
-      [(@nested_args if @nested_args.any?).collect{|a| "@#{a}"} , singular].join(",")
+      [(@nested_args if @nested_args.any? || []).collect{|a| "@#{a}"} , singular].join(",")
     end
 
     def path_helper_singular
