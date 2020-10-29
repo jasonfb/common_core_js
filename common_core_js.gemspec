@@ -7,13 +7,16 @@ require 'byebug'
 Gem::Specification.new do |spec|
   spec.name        = "common_core_js"
   spec.version     = CommonCoreJs::VERSION
-  spec.license     = 'MIT'
-  spec.date        = '2020-06-28'
+  spec.license     = 'Commit to Social Justice'
+  spec.date        = '2020-10-29'
   spec.summary     = "A gem build scaffolding."
   spec.description = "Simple, plug & play Rails scaffolding with really simple Javascript"
   spec.authors     = ["Jason Fleetwood-Boldt"]
   spec.email       = 'jason.fb@datatravels.com'
 
+  spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/common-core-js/'
+  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/common_core_js",
+                    "course_material_uri" => "https://jfb.teachable.com/p/jason-s-open-source-work/"}
 
 
 
