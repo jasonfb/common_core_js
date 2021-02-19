@@ -293,6 +293,24 @@ environment.plugins.prepend('Provide',
 module.exports = environment
 
 ```
+# VERSION HISTORY
+
+## 0.4.6
+
+- Fixes a bug with nested args
+
+## 0.4.2 - 0.4.5 - Oct 2020
+
+- Not sure what I was doing here or why I made 3 released on the same day
+- Several bugfixes
+
+## 0.3.0 - 0.4.1 - August 2020
+
+- Solid beta release
+
+## 0.2.0 - 0.1.1
+
+- Alpha stage
 
 
 # ACKNOWLEDGEMENTS
@@ -300,3 +318,5 @@ module.exports = environment
 ### "POOR MAN"
 
 I hope one day I will leave this Earth a poor man (like my code) owning only the most simple structure for the simple form of my existence. Thanks for having educated me in this wisdom goes to my former mentor [@trak3r](https://github.com/trak3r)! 
+
+
