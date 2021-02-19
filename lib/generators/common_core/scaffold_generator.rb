@@ -285,7 +285,11 @@ module CommonCore
     end
 
     def path_helper_args
-      [(@nested_args if @nested_args.any? || []).collect{|a| "@#{a}"} , singular].join(",")
+      if @nested_args.any?
+        [(@nested_args).collect{|a| "@#{a}"} , singular].join(",")
+      else
+        singular
+      end
     end
 
     def path_helper_singular
