@@ -14,10 +14,6 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Jason Fleetwood-Boldt"]
   spec.email       = 'jason.fb@datatravels.com'
 
-  spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/common-core-js/'
-  spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/common_core_js",
-                    "course_material_uri" => "https://jfb.teachable.com/p/jason-s-open-source-work/"}
-
 
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -38,10 +34,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails"
   spec.homepage    = 'https://blog.jasonfleetwoodboldt.com/common-core-js/'
   spec.metadata    = { "source_code_uri" => "https://github.com/jasonfb/common_core_js",
-                       "documentation_uri" => "https://github.com/jasonfb/common_core_js",
-                       "homepage_uri" => 'https://blog.jasonfleetwoodboldt.com/common-core-js/',
-                      "mailing_list_uri" => 'https://blog.jasonfleetwoodboldt.com/#sfba-form2-container'
-  }
+                       "documentation_uri" => "https://jfb.teachable.com/p/gems-by-jason",
+                       "homepage_uri" => 'https://blog.jasonfleetwoodboldt.com/common-core-js/'}
 
   spec.add_runtime_dependency('kaminari')
   spec.add_runtime_dependency('haml-rails')
