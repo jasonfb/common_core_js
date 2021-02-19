@@ -47,7 +47,7 @@ module CommonCore
       begin
         object = eval(class_name)
       rescue StandardError => e
-        puts "Ooops... it looks like there is no object for #{class_name}. Please define the object + database table first."
+        puts "*** Oops: It looks like there is no object for #{class_name}. Please define the object + database table first."
         exit
       end
 
@@ -68,7 +68,6 @@ module CommonCore
 
       args[1..-1].each do |a|
         var_name, var_value = a.split("=")
-        puts var_name
         case (var_name)
 
         when "plural"
@@ -108,7 +107,7 @@ module CommonCore
       end
 
       if @specs_only && @no_specs
-        puts "oops… you seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
+        puts "*** Oops: You seem to have specified both the --specs-only flag and --no-specs flags. this doesn't make any sense, so I am aborting. sorry."
         exit
       end
 
@@ -157,7 +156,11 @@ module CommonCore
         if assoc
           ownership_field = assoc.name.to_s + "_id"
         else
-          puts "Ooops... it looks like is no association for #{@object_owner_sym} on #{singular_class} "
+          if @auth
+            puts "*** Oops: It looks like is no association from current_#{@object_owner_sym} to a class called #{singular_class}. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+          else
+            puts "*** Oops:  god mode could not find the association(?). something is wrong."
+          end
           exit
         end
       end
@@ -449,26 +452,27 @@ module CommonCore
               puts "*** Oops. on the #{singular_class} object, there doesn't seem to be an association called '#{assoc_name}'"
               exit
             end
-            assoc_class_name = eval("#{singular_class}.reflect_on_association(:#{assoc_name})").class_name
 
-            if assoc.active_record.column_names.include?("name")
+
+            assoc_class = eval(assoc.class_name)
+
+            if assoc_class.column_names.include?("name")
               display_column = "name"
-            elsif assoc.active_record.column_names.include?("to_label")
+            elsif assoc_class.column_names.include?("to_label")
               display_column = "to_label"
-            elsif assoc.active_record.column_names.include?("full_name")
+            elsif assoc_class.column_names.include?("full_name")
               display_column = "full_name"
-            elsif assoc.active_record.column_names.include?("display_name")
+            elsif assoc_class.column_names.include?("display_name")
               display_column = "display_name"
-            elsif assoc.active_record.column_names.include?("email")
+            elsif assoc_class.column_names.include?("email")
               display_column = "email"
             else
-              puts "Can't find a display_column on {singular_class} object"
+              puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
-
 
             ".row
   %div{class: \"form-group col-md-4 \#{'alert-danger' if #{singular}.errors.details.keys.include?(:#{assoc_name.to_s})}\"}
-    = f.collection_select(:#{col.to_s}, #{assoc_class_name}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
+    = f.collection_select(:#{col.to_s}, #{assoc_class}.all, :id, :#{display_column}, {prompt: true, selected: @#{singular}.#{col.to_s} }, class: 'form-control')
     %label.small.form-text.text-muted
       #{col.to_s.humanize}"
 
@@ -549,18 +553,21 @@ module CommonCore
               exit
             end
 
-            if assoc.active_record.column_names.include?("name")
+
+            assoc_class = eval(assoc.class_name)
+
+            if assoc_class.column_names.include?("name")
               display_column = "name"
-            elsif assoc.active_record.column_names.include?("to_label")
+            elsif assoc_class.column_names.include?("to_label")
               display_column = "to_label"
-            elsif assoc.active_record.column_names.include?("full_name")
+            elsif assoc_class.column_names.include?("full_name")
               display_column = "full_name"
-            elsif assoc.active_record.column_names.include?("display_name")
+            elsif assoc_class.column_names.include?("display_name")
               display_column = "display_name"
-            elsif assoc.active_record.column_names.include?("email")
+            elsif assoc_class.column_names.include?("email")
               display_column = "email"
             else
-              puts "cant find any column to use as label for #{assoc.name.to_s}; any of name, to_labe, full_name, display_name, or email"
+              puts "*** Oops: Can't find any column to use as the display label for the #{assoc.name.to_s} association on the #{singular_class} model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your #{assoc.class_name} model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
             end
 
             "  %td
