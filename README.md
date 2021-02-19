@@ -297,12 +297,12 @@ module.exports = environment
 
 ## 0.4.6
 
-- Fixes a bug with nested args
+- Fixes a bug that would happen if you had no nested args
 
 ## 0.4.2 - 0.4.5 - Oct 2020
 
-- Not sure what I was doing here or why I made 3 released on the same day
-- Several bugfixes
+- Not sure what I was doing here or why I made 3 releases on the same day(?)
+- Several bugfixes happened during these iterations
 
 ## 0.3.0 - 0.4.1 - August 2020
 
