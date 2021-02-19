@@ -295,6 +295,19 @@ module.exports = environment
 ```
 # VERSION HISTORY
 
+## 0.4.7
+- fixes some problems with display labeling through active record associations (was using a funky syntax for this)
+- significant improvments to error messaging, like:
+
+if you don't have a `current_user` and you don't specify an auth or auth_identifier (and you aren't using `--god` mode), helpful hint:
+
+"*** Oops: It looks like is no association from current_user to a class called Invoice. If your user is called something else, pass with flag auth=current_X where X is the model for your users as lowercase. Also, be sure to implement current_X as a method on your controller. (If you really don't want to implement a current_X on your controller and want me to check some other method for your current user, see the section in the docs for auth_identifier.) To make a controller that can read all records, specify with --god."
+
+
+If an association is on a model but the assocition has no field that can be used to display its name, you get this hint:
+
+"*** Oops: Can't find any column to use as the display label for the account association on the Invoice model . TODO: Please implement just one of: 1) name, 2) to_label, 3) full_name, 4) display_name, or 5) email directly on your Account model (either as database field or model methods), then RERUN THIS GENERATOR. (If more than one is implemented, the field to use will be chosen based on the rank here, e.g., if name is present it will be used; if not, I will look for a to_label, etc)"
+
 ## 0.4.6
 
 - Fixes a bug that would happen if you had no nested args
