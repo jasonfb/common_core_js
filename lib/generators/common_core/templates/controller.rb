@@ -42,20 +42,23 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
     end
   end
 
-<% if create_action %>  def new
+<% if create_action %>  def new <% if !@auth.nil? %>
     @<%= singular_name %> = <%= class_name  %>.new(<%= @object_owner_sym %>: <%= @object_owner_eval %>)
+   <% else %>
+    @<%= singular_name %> = <%= class_name  %>.new
+   <% end %>
     respond_to do |format|
       format.js
     end
   end
 
   def create
-    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !@object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %>, <%= @auth %>)
+    modified_params = modify_date_inputs_on_params(<%=singular_name %>_params.dup<% if !@object_owner_sym.empty? %>.merge!(<%= @object_owner_sym %>: <%= @object_owner_eval %> )<% end %> <%= @auth ? ', ' + @auth : '' %>)
     @<%=singular_name %> = <%=class_name %>.create(modified_params)
     respond_to do |format|
       if @<%= singular_name %>.save
       else
-        flash[:alert] = "Oops, your <%=singular_name %> could not be saved."
+        flash[:alert] = "Oops, your <%=singular_name %> could not be created."
       end
       format.js
     end
@@ -75,7 +78,7 @@ class <%= controller_class_name %> < <%= controller_descends_from %>
 
   def update
     respond_to do |format|
-      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params, <%= @auth %>  ))
+      if !@<%=singular_name %>.update(modify_date_inputs_on_params(<%= singular %>_params<%= @auth ? ', ' + @auth : '' %>))
         flash[:alert] = "<%=singular_name.titlecase %> could not be saved"
       end
       format.js {}

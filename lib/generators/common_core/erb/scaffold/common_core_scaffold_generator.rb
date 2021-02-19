@@ -18,7 +18,6 @@ module Erb
       end
 
       def filename_with_extensions(name, file_format = format)
-        byebug
         [name, file_format, handler].compact.join(".")
       end
     end
