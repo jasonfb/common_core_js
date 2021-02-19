@@ -295,6 +295,10 @@ module.exports = environment
 ```
 # VERSION HISTORY
 
+## 0.4.8  * IN PROGRESS (master branch)*
+
+- fixes an issue with the new action when in --god mode
+
 ## 0.4.7
 - fixes some problems with display labeling through active record associations (was using a funky syntax for this)
 - significant improvments to error messaging, like:
