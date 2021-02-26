@@ -2,5 +2,5 @@
 
 is now 
 
-# [https://github.com/jasonfb/hot-glue](HOT GLUE)
+# [HOT GLUE](https://github.com/jasonfb/hot-glue)
 
