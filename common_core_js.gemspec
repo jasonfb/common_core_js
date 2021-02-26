@@ -7,8 +7,8 @@ require 'byebug'
 Gem::Specification.new do |spec|
   spec.name        = "common_core_js"
   spec.version     = CommonCoreJs::VERSION
-  spec.license     = 'Commit to Social Justice'
-  spec.date        = '2020-10-29'
+  spec.license     = 'Nonstandard'
+  spec.date        = Time.now.strftime("%Y-%m-%d")
   spec.summary     = "A gem build scaffolding."
   spec.description = "Simple, plug & play Rails scaffolding with really simple Javascript"
   spec.authors     = ["Jason Fleetwood-Boldt"]

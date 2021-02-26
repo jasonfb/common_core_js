@@ -1,25 +1,15 @@
 class <%= controller_class_name %> < <%= controller_descends_from %>
-<% unless @auth_identifier == '' %>
-  before_action :authenticate_<%= auth_identifier %>!
-
-<% end %>
+<% unless @auth_identifier == '' || @auth.nil? %>before_action :authenticate_<%= auth_identifier %>!<% end %>
 <% if any_nested? %> <% @nested_args.each do |arg| %>
   before_action :load_<%= arg %><% end %> <% end %>
   before_action :load_<%= singular_name %>, only: [:show, :edit, :update, :destroy]
   helper :common_core
   include CommonCoreJs::ControllerHelpers
-
-  <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each do |arg| %>
-      <% if nest_chain.empty?
-        this_scope = "#{@auth ? auth_object : class_name}.#{arg}s"
-      else
-        this_scope = "@#{nest_chain.last}.#{arg}s"
-      end
-      nest_chain << arg %>
-  def load_<%= arg %>
+  <% if any_nested? %><% nest_chain = [] %> <% @nested_args.each { |arg|
+    this_scope =   nest_chain.empty? ?  "#{@auth ? auth_object : class_name}.#{arg}s" : "@#{nest_chain.last}.#{arg}s"
+      nest_chain << arg %>def load_<%= arg %>
     @<%= arg %> = <%= this_scope %>.find(params[:<%= arg %>_id])
-  end<% end %> <% end %>
-
+  end<% } %><% end %>
 
 <% if !@self_auth %>
   def load_<%= singular_name %>
